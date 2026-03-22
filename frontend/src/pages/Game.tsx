@@ -259,10 +259,12 @@ const StreetViewApp = () => {
         nextRound: guessData.currentRound,
         totalScore: guessData.totalScore,
       });
-        
+      
       if (guessData.finished && guessData.achievementsUnlocked.length > 0) {
         setFinishedGamePending(true);
       }
+        
+
 
       setPendingNextLocation(null);
       if (!guessData.finished) {
