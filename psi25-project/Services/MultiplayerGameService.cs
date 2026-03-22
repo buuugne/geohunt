@@ -12,17 +12,20 @@ namespace psi25_project.Services
         private readonly IPlayerRepository _playerRepository;
         private readonly IRoomRepository _roomRepository;
         private readonly IGeocodingService _geocodingService;
+        private readonly ILeaderboardService _leaderboardService;
 
         public MultiplayerGameService(
             IMultiplayerGameRepository gameRepository,
             IPlayerRepository playerRepository,
             IRoomRepository roomRepository,
-            IGeocodingService geocodingService)
+            IGeocodingService geocodingService,
+            ILeaderboardService leaderboardService)
         {
             _gameRepository = gameRepository;
             _playerRepository = playerRepository;
             _roomRepository = roomRepository;
             _geocodingService = geocodingService;
+            _leaderboardService = leaderboardService;
         }
 
         public async Task<MultiplayerGameDto> StartGameAsync(Guid roomId)
@@ -35,7 +38,7 @@ namespace psi25_project.Services
 
             var (success, result) = await _geocodingService.GetValidCoordinatesAsync();
             if (!success) throw new InvalidOperationException("Failed to generate valid coordinates");
-            
+
             var coordsData = (dynamic)result;
             var coords = coordsData.modifiedCoordinates;
 
@@ -112,13 +115,13 @@ namespace psi25_project.Services
                 throw new InvalidOperationException("All rounds already completed");
 
             game.CurrentRound++;
-            
+
             var (success, result) = await _geocodingService.GetValidCoordinatesAsync();
             if (!success) throw new InvalidOperationException("Failed to generate valid coordinates");
-            
+
             var coordsData = (dynamic)result;
             var coords = coordsData.modifiedCoordinates;
-            
+
             game.RoundLatitude = (double)coords.lat;
             game.RoundLongitude = (double)coords.lng;
 
@@ -146,16 +149,20 @@ namespace psi25_project.Services
             if (room != null)
             {
                 room.Status = RoomStatus.Lobby;
-                
                 foreach (var player in room.Players)
-                {
                     player.IsReady = false;
-                }
-                
                 await _roomRepository.UpdateRoomAsync(room);
             }
 
             await _gameRepository.UpdateAsync(game);
+
+            // Update leaderboard for every player when multiplayer game finishes
+            foreach (var mp in game.Players)
+            {
+                var userId = mp.Player.UserId;
+                await _leaderboardService.UpdatePlayerRankingAsync(userId, mp.Score);
+            }
+
             return MapToDto(game);
         }
 
