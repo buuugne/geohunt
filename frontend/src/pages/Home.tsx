@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [_loggedIn, setLoggedIn] = useState(true);
 
   useEffect(() => {
     const checkLogin = async () => {
