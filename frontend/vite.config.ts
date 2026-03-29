@@ -4,6 +4,7 @@ import tailwind from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwind()],
+  base: '/geohunt/',
   server: {
     port: 5042, // frontend runs here
     proxy: {
