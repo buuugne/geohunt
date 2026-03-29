@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master, develop, try-tests-ci ]
   pull_request:
     branches: [ main, master, develop ]
 
@@ -19,11 +19,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore backend
-        run: dotnet restore psi25-project/psi25-project.csproj
+      - name: Restore solution
+        run: dotnet restore psi25-project.sln
 
-      - name: Build backend
-        run: dotnet build psi25-project/psi25-project.csproj --no-restore --configuration Release
+      - name: Build solution
+        run: dotnet build psi25-project.sln --no-restore --configuration Release
+
+      - name: Test solution
+        run: dotnet test psi25-project.sln --no-build --configuration Release
 
       - name: Setup Node
         uses: actions/setup-node@v4
