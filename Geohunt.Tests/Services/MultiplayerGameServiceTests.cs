@@ -23,11 +23,10 @@ public class MultiplayerGameServiceTests
         _mockRoomRepository = new Mock<IRoomRepository>();
         _mockGeocodingService = new Mock<IGeocodingService>();
 
+       var mockLeaderboardService = new Mock<ILeaderboardService>();
         _service = new MultiplayerGameService(
             _mockGameRepository.Object,
-            _mockPlayerRepository.Object,
-            _mockRoomRepository.Object,
-            _mockGeocodingService.Object);
+            _mockPlayerRepository.Object,_mockRoomRepository.Object, _mockGeocodingService.Object,mockLeaderboardService.Object);
     }
 
     #region StartGameAsync

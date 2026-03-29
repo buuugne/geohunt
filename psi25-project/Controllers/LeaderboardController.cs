@@ -15,7 +15,14 @@ namespace psi25_project.Controllers
             _leaderboardService = leaderboardService;
         }
 
-        // Called by the frontend Leaderboard page
+        [HttpGet("top")]
+        public async Task<IActionResult> GetTopPlayers([FromQuery] int top = 20)
+        {
+            var entries = await _leaderboardService.GetTopPlayersAsync(top);
+            return Ok(entries);
+        }
+
+        // Called fronto
         [HttpGet]
         public async Task<IActionResult> GetLeaderboard([FromQuery] int top = 20)
         {
@@ -29,5 +36,6 @@ namespace psi25_project.Controllers
 
             return Ok(response);
         }
+
     }
 }

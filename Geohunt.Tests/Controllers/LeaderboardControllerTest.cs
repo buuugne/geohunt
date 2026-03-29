@@ -27,7 +27,7 @@ namespace Geohunt.Tests.Controllers
                 new LeaderboardEntry { Id = 2, Username = "Player2", TotalScore = 90, DistanceKm = 10 }
             };
 
-            _mockService.Setup(s => s.GetTopLeaderboardAsync(It.IsAny<int>()))
+            _mockService.Setup(s => s.GetTopPlayersAsync(It.IsAny<int>()))
                         .ReturnsAsync(leaderboardData);
 
             // Act
@@ -35,10 +35,10 @@ namespace Geohunt.Tests.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var value = Assert.IsType<List<LeaderboardEntry>>(okResult.Value);
-
-            Assert.Equal(2, value.Count);
-            Assert.Equal("Player1", value[0].Username);
+            dynamic value = okResult.Value!;
+            var entries = (List<LeaderboardEntry>)value.Entries;
+            Assert.Equal(2, entries.Count);
+            Assert.Equal("Player1", entries[0].Username);
         }
 
         [Fact]
@@ -62,10 +62,8 @@ namespace Geohunt.Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var value = Assert.IsType<List<LeaderboardEntry>>(okResult.Value);
-
             Assert.Equal(top, value.Count);
             Assert.Equal("Player1", value[0].Username);
-
             _mockService.Verify(s => s.GetTopPlayersAsync(top), Times.Once);
         }
 
@@ -85,7 +83,6 @@ namespace Geohunt.Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.IsType<List<LeaderboardEntry>>(okResult.Value);
-
             _mockService.Verify(s => s.GetTopPlayersAsync(expectedTop), Times.Once);
         }
     }

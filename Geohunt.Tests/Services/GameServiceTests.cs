@@ -3,18 +3,20 @@ using psi25_project.Services;
 using psi25_project.Models;
 using psi25_project.Models.Dtos;
 using psi25_project.Repositories.Interfaces;
+using psi25_project.Services.Interfaces;
 
 namespace Geohunt.Tests.Services;
 
 public class GameServiceTests
 {
-    private readonly Mock<IGameRepository> _mockRepository;
+        private readonly Mock<IGameRepository> _mockRepository;
     private readonly GameService _service;
 
     public GameServiceTests()
     {
         _mockRepository = new Mock<IGameRepository>();
-        _service = new GameService(_mockRepository.Object);
+        var mockLeaderboardService = new Mock<ILeaderboardService>();
+        _service = new GameService(_mockRepository.Object, mockLeaderboardService.Object);
     }
 
     [Fact]

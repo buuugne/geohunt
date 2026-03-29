@@ -21,7 +21,8 @@ public class GuessServiceTests
         _mockGameRepository = new Mock<IGameRepository>();
         _mockLocationRepository = new Mock<ILocationRepository>();
         _achievementService = new Mock<IAchievementService>();
-        _service = new GuessService(_mockGuessRepository.Object, _mockGameRepository.Object, _mockLocationRepository.Object, _achievementService.Object);
+        var mockLeaderboardService = new Mock<ILeaderboardService>();
+        _service = new GuessService(_mockGuessRepository.Object, _mockGameRepository.Object, _mockLocationRepository.Object, _achievementService.Object, mockLeaderboardService.Object);
     }
 
     [Fact]
