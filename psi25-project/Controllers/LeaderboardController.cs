@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using psi25_project.Services.Interfaces;
-
+using psi25_project.Models.Dtos;
 
 namespace psi25_project.Controllers
 {
@@ -15,18 +15,19 @@ namespace psi25_project.Controllers
             _leaderboardService = leaderboardService;
         }
 
-        [HttpGet("top-scores")]
-        public async Task<ActionResult> GetLeaderboard()
+        // Called by the frontend Leaderboard page
+        [HttpGet]
+        public async Task<IActionResult> GetLeaderboard([FromQuery] int top = 20)
         {
-            var leaderboard = await _leaderboardService.GetTopLeaderboardAsync();
-            return Ok(leaderboard);
-        }
-        
-        [HttpGet("top-players")]
-        public async Task<IActionResult> GetTopPlayers([FromQuery] int top = 20)
-        {
-            var result = await _leaderboardService.GetTopPlayersAsync(top);
-            return Ok(result);
+            var entries = await _leaderboardService.GetTopPlayersAsync(top);
+
+            var response = new
+            {
+                Entries = entries,
+                LastUpdatedAt = (DateTime?)null
+            };
+
+            return Ok(response);
         }
     }
 }

@@ -11,17 +11,20 @@ namespace psi25_project.Services
         private readonly IGameRepository _gameRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IAchievementService _achievementService;
+        private readonly ILeaderboardService _leaderboardService;
 
         public GuessService(
             IGuessRepository guessRepository,
             IGameRepository gameRepository,
             ILocationRepository locationRepository,
-            IAchievementService achievementService)
+            IAchievementService achievementService,
+            ILeaderboardService leaderboardService)
         {
             _guessRepository = guessRepository;
             _gameRepository = gameRepository;
             _locationRepository = locationRepository;
             _achievementService = achievementService;
+            _leaderboardService = leaderboardService;
         }
 
         public async Task<(GuessResponseDto guess, bool finished, int currentRound, int totalScore, IReadOnlyList<AchievementUnlockDto> newAchievements)>
@@ -65,7 +68,6 @@ namespace psi25_project.Services
                 distanceKm: guess.DistanceKm,
                 score: guess.Score
             );
-            
 
             List<UserAchievement> allUnlocks = new(roundUnlocks);
 
@@ -78,10 +80,12 @@ namespace psi25_project.Services
                     totalRounds: game.TotalRounds);
 
                 allUnlocks.AddRange(gameUnlocks);
+
+                // Update leaderboard when the last round is submitted
+                await _leaderboardService.UpdatePlayerRankingAsync(game.UserId, game.TotalScore);
             }
 
             var response = MapToDto(guess, location);
-
             var newAchievements = MapToDtoList(allUnlocks);
 
             return (response, game.FinishedAt != null, game.CurrentRound, game.TotalScore, newAchievements);
@@ -120,11 +124,11 @@ namespace psi25_project.Services
                 game.CurrentRound++;
         }
 
-        private static IReadOnlyList<AchievementUnlockDto> MapToDtoList (List<UserAchievement> allUnlocks)
+        private static IReadOnlyList<AchievementUnlockDto> MapToDtoList(List<UserAchievement> allUnlocks)
         {
             if (allUnlocks == null || allUnlocks.Count == 0)
                 return Array.Empty<AchievementUnlockDto>();
- 
+
             var dtoList = new List<AchievementUnlockDto>();
 
             foreach (var ua in allUnlocks)

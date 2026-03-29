@@ -8,10 +8,12 @@ namespace psi25_project.Services
     public class GameService : IGameService
     {
         private readonly IGameRepository _gameRepository;
+        private readonly ILeaderboardService _leaderboardService;
 
-        public GameService(IGameRepository gameRepository)
+        public GameService(IGameRepository gameRepository, ILeaderboardService leaderboardService)
         {
             _gameRepository = gameRepository;
+            _leaderboardService = leaderboardService;
         }
 
         private async Task<Game> GetGameOrThrowAsync(Guid gameId)
@@ -19,7 +21,6 @@ namespace psi25_project.Services
             var game = await _gameRepository.GetByIdAsync(gameId);
             if (game == null)
                 throw new KeyNotFoundException("Game not found");
-
             return game;
         }
 
@@ -38,7 +39,6 @@ namespace psi25_project.Services
             };
 
             await _gameRepository.AddAsync(game);
-
             return ToDto(game);
         }
 
@@ -52,6 +52,9 @@ namespace psi25_project.Services
             game.FinishedAt = DateTime.UtcNow;
             await _gameRepository.UpdateAsync(game);
 
+            // Trigger leaderboard update after game is saved
+            await _leaderboardService.UpdatePlayerRankingAsync(game.UserId, game.TotalScore);
+
             return game;
         }
 
@@ -60,7 +63,6 @@ namespace psi25_project.Services
             var game = await GetGameOrThrowAsync(gameId);
             game.TotalScore += score;
             await _gameRepository.UpdateAsync(game);
-
             return game;
         }
 

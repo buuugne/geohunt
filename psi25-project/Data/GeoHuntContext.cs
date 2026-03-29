@@ -5,7 +5,7 @@ using psi25_project.Models;
 
 namespace psi25_project.Data
 {
-    public class GeoHuntContext 
+    public class GeoHuntContext
         : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public GeoHuntContext(DbContextOptions<GeoHuntContext> options)
@@ -23,6 +23,8 @@ namespace psi25_project.Data
         public DbSet<Achievement> Achievements { get; set; } = default!;
         public DbSet<UserAchievement> UserAchievements { get; set; } = default!;
         public DbSet<UserStats> UserStats { get; set; } = default!;
+        public DbSet<Leaderboard> Leaderboards { get; set; } = default!;
+        public DbSet<PlayerRanking> PlayerRankings { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -165,7 +167,7 @@ namespace psi25_project.Data
             entity.HasKey(us => us.UserId);
 
             entity.HasOne(us => us.User)
-                .WithOne() 
+                .WithOne()
                 .HasForeignKey<UserStats>(us => us.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -180,6 +182,27 @@ namespace psi25_project.Data
 
             entity.Property(us => us.CurrentStreakDays)
                 .HasDefaultValue(0);
+        }
+        
+        private static void ConfigureLeaderboard(ModelBuilder modelBuilder)
+        {
+            var leaderboard = modelBuilder.Entity<Leaderboard>();
+            leaderboard.HasKey(l => l.Id);
+            leaderboard.Property(l => l.LastUpdatedAt).IsRequired();
+ 
+            var ranking = modelBuilder.Entity<PlayerRanking>();
+            ranking.HasKey(r => r.Id);
+            ranking.HasOne(r => r.Leaderboard)
+                .WithMany(l => l.Rankings)
+                .HasForeignKey(r => r.LeaderboardId)
+                .OnDelete(DeleteBehavior.Cascade);
+            ranking.HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            ranking.HasIndex(r => new { r.LeaderboardId, r.UserId }).IsUnique();
+            ranking.Property(r => r.TotalScore).HasDefaultValue(0);
+            ranking.Property(r => r.Rank).HasDefaultValue(0);
         }
     }
 }

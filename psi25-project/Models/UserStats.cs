@@ -9,6 +9,7 @@ public class UserStats
     public int CurrentStreakDays { get; set; }
     public int LongestStreakDays { get; set; }
     public DateTime? LastPlayedDateUtc { get; set; }
+    public int TotalScore { get; set; } 
 
     public ApplicationUser? User { get; set; }
 }

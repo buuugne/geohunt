@@ -51,6 +51,8 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddSingleton<IRoomOnlineService, RoomOnlineService>();
+builder.Services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<IMultiplayerGameRepository, MultiplayerGameRepository>();
 builder.Services.AddScoped<IMultiplayerGameService, MultiplayerGameService>();
 

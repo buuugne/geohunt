@@ -11,6 +11,7 @@ import MultiplayerGame from './pages/MultiplayerGame'
 import UserPage from './pages/UserPage'
 import Layout from './components/Layout'
 import About from './pages/About'
+import Leaderboard from './pages/Leaderboard'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
       <Route path="/room/:roomCode" element={<RoomLobby />} />
       <Route path="*" element={<div className="p-6">404 - Page Not Found</div>} />
       <Route element={<Layout/>}>
+        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/user" element={<UserPage/>}/>
         <Route path="/start" element={<Start />} />
         <Route path="/" element={<Home />} />
