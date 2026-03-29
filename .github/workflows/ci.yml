@@ -20,17 +20,17 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore backend
-        run: dotnet restore psi25-project.csproj
+        run: dotnet restore psi25-project/psi25-project.csproj
 
       - name: Build backend
-        run: dotnet build psi25-project.csproj --no-restore --configuration Release
+        run: dotnet build psi25-project/psi25-project.csproj --no-restore --configuration Release
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install frontend
+      - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
